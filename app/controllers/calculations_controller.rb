@@ -13,11 +13,22 @@ class CalculationsController < ApplicationController
 
     @character_count_with_spaces = @text.length
 
-    @character_count_without_spaces = @text.gsub(" ","").length
+
+
+
+    @character_count_without_spaces = @text.gsub(/\s+/, "").length
 
     @word_count = @text.split.count
 
-    @occurrences = @text.split.count(@special_word)+ @text.split.count(@special_word.capitalize) + @text.split.count(@special_word.upcase) + @text.split.count(@special_word.downcase)
+    @text_remove_everything=@text.gsub(/[^a-z0-9\s]/i, '')
+
+    @text_downcase=@text_remove_everything.downcase
+
+    @word_array=@text_downcase.split
+
+
+    @occurrences = @word_array.count(@special_word.downcase)
+
 end
 
   def loan_payment
@@ -84,12 +95,35 @@ end
 #I had trouble figuring out the last bottom most portion so I didn't want my code to error out. Perhaps we could cover some of the syntax around how to calculate these descriptive statistics? Thank you!
 
 
-    # @mean = average(@numbers)
+    @mean = @sum/@count
 
-    # @variance = (@variance = @numbers.inject(0.0){|sum,x| sum+(x-@mean)**2}/@numbers.count
+   squared_differences = []
 
-    # @standard_deviation = sqrt(@variance)
+    @numbers.each do |num|
+      difference = num - @mean
+      squared_difference = difference ** 2
+      squared_differences.push(squared_difference)
+    end
 
-    # @mode = "Replace this string with your answer."
+    @variance = squared_differences.sum / @count
+
+
+    @standard_deviation = Math.sqrt(@variance)
+
+    # Mode
+    # ====
+
+    leader = nil
+    leader_count = 0
+
+    @numbers.each do |num|
+      occurrences = @numbers.count(num)
+      if occurrences > leader_count
+        leader = num
+        leader_count = occurrences
+      end
+    end
+
+    @mode = leader
   end
 end
